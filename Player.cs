@@ -4,34 +4,47 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public Projectile missilePrefab;
+    public GameObject missilePrefab;
     public float speed = 5.0f;
     private bool _missileActive;
+    public int playerHP;
+
+    private void Shoot()
+    {
+        if (!_missileActive)
+        {
+            Instantiate(missilePrefab, transform.position, Quaternion.identity);
+            _missileActive = true;
+        }
+
+        else
+        {
+            _missileActive = false;
+        }
+    }
+    
     private void Update()
     {
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            this.transform.position += Vector3.left * this.speed * Time.deltaTime;
+            this.transform.position += Vector3.left * speed * Time.deltaTime;
         } else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            this.transform.position += Vector3.right * this.speed * Time.deltaTime;
+            this.transform.position += Vector3.right * speed * Time.deltaTime;
         }
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             Shoot();
         }
     }
-    private void Shoot()
+
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!_missileActive)
+        playerHP -= 1;
+        if (this.playerHP <= 0)
         {
-            Projectile projectile = Instantiate(this.missilePrefab, this.transform.position, Quaternion.identity);
-            projectile.destroyed += MissileDestroyed;
-            _missileActive = true;
+            Destroy(this.gameObject);
+            this.gameObject.SetActive(false);
         }
-    }
-    private void MissileDestroyed()
-    {
-        _missileActive = false;
     }
 }
